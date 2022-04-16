@@ -3,15 +3,20 @@ const router = express.Router()
 const { v4: uuidv4 } = require('uuid')
 const usuarioMid = require('../middleware/validarUsuario.middleware')
 
-const {Usuario} = require('../models')
+const {Usuario} = require('../db/models')
 
 
 router.post('/', usuarioMid)
 router.put('/', usuarioMid)
 
 router.get('/', async (req, res) => {
-    const usuario = await Usuario.findAll()
-    res.json({usuarios: usuario})
+    try {
+        const usuario = await Usuario.findAll()
+        res.json({usuarios: usuario})
+    } catch (error) {
+        console.log(error)
+    }
+    
 })
 
 

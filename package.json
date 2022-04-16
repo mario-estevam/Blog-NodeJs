@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon --exec node index.js",
+    "start": "nodemon --exec node src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Mario Estevam",
@@ -16,6 +16,7 @@
     "ajv": "^8.11.0",
     "ajv-formats": "^2.1.1",
     "express": "^4.17.3",
+    "mongoose": "^5.13.8",
     "sequelize": "^6.19.0",
     "sqlite3": "^5.0.3",
     "uuid": "^8.3.2"
