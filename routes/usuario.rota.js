@@ -3,43 +3,51 @@ const router = express.Router()
 const { v4: uuidv4 } = require('uuid')
 const usuarioMid = require('../middleware/validarUsuario.middleware')
 
-const usuarios = {}
+const {Usuario} = require('../models')
+
 
 router.post('/', usuarioMid)
 router.put('/', usuarioMid)
 
-router.get('/:id', (req, res) => {
-    res.json({usuarios: usuarios[req.params.id]})
+router.get('/', async (req, res) => {
+    const usuario = await Usuario.findAll()
+    res.json({usuarios: usuario})
 })
 
-router.put('/', (req, res) => {
-    const id = req.query.id
-    const usuario = req.body
-    usuario.id = id
-    usuarios[id] = usuario
-    res.json({msg: "Usuário atualizado com sucesso!"})
+
+router.get('/:id', async (req, res) => {
+    const usuario = await Usuario.findByPk(req.params.id)
+    res.json({usuarios: usuario})
 })
 
-router.delete('/', (req, res) => {
+router.put('/', async (req, res) => {
     const id = req.query.id
-    if (id && usuarios[id]){
-        delete usuarios[id]
-        res.json({msg: "Usuário deletado com sucesso!"})
+    const usuario = await Usuario.findByPk(id)
+    if (usuario){
+        usuario.email = req.body.email
+        usuario.senha = req.body.senha
+        await usuario.save()
+        res.json({msg: "Usuario atualizado com sucesso!"})
     }else{
-        res.status(400).json({msg: "Usuário não encontrado!"})
+        res.status(400).json({msg: "Usuario não encontrado!"})
     }
 })
 
-router.post('/', (req, res) => {
-    const usuario = req.body
-    const idUsuario = uuidv4()
-    usuario.id = idUsuario
-    usuarios[idUsuario] = usuario
-    res.json({msg: "Usuário adicionado com sucesso!"})    
+router.delete('/', async (req, res) => {
+    const id = req.query.id
+    const usuario = await Usuario.findByPk(id)
+    if (post){
+        await usuario.destroy()
+        res.json({msg: "Usuario deletado com sucesso!"})
+    }else{
+        res.status(400).json({msg: "Usuario não encontrado!"})
+    }
 })
 
-router.get('/', (req, res) => {
-    res.json({usuarios: Object.values(usuarios)})
+router.post('/', async (req, res) => {
+    const usuario = await Usuario.create(req.body)
+    res.json({msg: `Usuario ${usuario.email} criado com sucesso`})    
 })
+
 
 module.exports = router
