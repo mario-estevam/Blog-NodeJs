@@ -6,9 +6,10 @@ var expressLayouts = require('express-ejs-layouts')
 
 const indexRoute = require('./routes/index.rota')
 
-
+const logger = require('./utils/logger')
 
 const app = express()
+
 
 app.use(express.json())
 app.set('view engine', 'ejs')
@@ -23,8 +24,12 @@ app.use('/api/usuarios', rotaUsuario)
 app.use('/api/posts', rotaPost)
 app.use('/', indexRoute)
 
-
+app.use((err, req, res, next) => {
+    const { statusCode, msg } = err
+    res.status(statusCode).json({msg: msg})
+})
 
 app.listen(8080, () => {
-    console.log('Servidor pronto na porta 8080')
+    logger.info(`Iniciando no ambiente ${process.env.NODE_ENV}`)
+    logger.info('Servidor pronto na porta 8080')
 })

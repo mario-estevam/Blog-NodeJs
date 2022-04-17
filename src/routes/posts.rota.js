@@ -5,6 +5,7 @@ const path = require('path')
 const postMid = require('../middleware/validarPost.middleware')
 const { Post, Usuario } = require('../db/models')
 var  multer   =  require ( 'multer' ) 
+const ErrorHandler = require('../utils/ErrorHandler')
 
 
 var storage = multer.diskStorage({
@@ -45,13 +46,18 @@ router.get('/:id', async (req, res) => {
         res.json({posts: postProcessado})
 })
 
-router.post('/', async (req, res) => {
+router.post('/', async (req, res, next) => {
         const data = req.body
         if (req.file){
                 data.foto = `/static/uploads/${req.file.filename}`
         }
-        const post = await Post.create(data)
-        res.json({msg: "Post adicionado com sucesso!"})
+        try{
+                const post = await Post.create(data)
+                res.json({msg: "Post adicionado com sucesso!"})
+        }catch (err){
+                next(new ErrorHandler(500, 'Falha interna ao adicionar postagem'))
+        }
+
 })
 
 router.post('/:id/upload', upload.single('foto'), async (req, res) => {
