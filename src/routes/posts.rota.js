@@ -27,6 +27,7 @@ const fileFilter = (req, file, cb) => {
 
 var upload = multer({ storage: storage, fileFilter: fileFilter })
 
+router.post('/', upload.single('foto'))
 router.post('/', postMid)
 router.put('/', postMid)
 
@@ -45,13 +46,25 @@ router.get('/:id', async (req, res) => {
 })
 
 router.post('/', async (req, res) => {
-        const post = await Post.create(req.body)
+        const data = req.body
+        if (req.file){
+                data.foto = `/static/uploads/${req.file.filename}`
+        }
+        const post = await Post.create(data)
         res.json({msg: "Post adicionado com sucesso!"})
 })
 
-router.post('/upload', upload . single ( 'foto' ), async (req, res) => {
-    console.log(req.file)
-    res.json({msg: 'Arquivo enviado com sucesso'})
+router.post('/:id/upload', upload.single('foto'), async (req, res) => {
+        console.log(req.file)
+        const id = req.params.id
+        const post = await Post.findByPk(id)
+        if (post){
+                post.foto = `/static/uploads/${req.file.filename}`
+                await post.save()
+                res.json({msg: "Upload realizado com sucesso!"})
+        }else{
+                res.status(400).json({msg: "Post não encontrado!"})
+        }
 })
 
 router.delete('/', async (req, res) => {
