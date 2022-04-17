@@ -9,10 +9,12 @@ const indexRoute = require('./routes/index.rota')
 const logger = require('./utils/logger')
 
 const app = express()
-
+const logMid = require('./middleware/log.mid')
 
 app.use(express.json())
 app.set('view engine', 'ejs')
+app.use(logMid)
+
 
 app.set('layout', 'layouts/layout')
 
