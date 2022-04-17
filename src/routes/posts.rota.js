@@ -6,6 +6,7 @@ const postMid = require('../middleware/validarPost.middleware')
 const { Post, Usuario } = require('../db/models')
 var  multer   =  require ( 'multer' ) 
 const ErrorHandler = require('../utils/ErrorHandler')
+const autenticar = require('../middleware/autenticacao.mid')
 
 
 var storage = multer.diskStorage({
@@ -28,9 +29,9 @@ const fileFilter = (req, file, cb) => {
 
 var upload = multer({ storage: storage, fileFilter: fileFilter })
 
-router.post('/', upload.single('foto'))
-router.post('/', postMid)
-router.put('/', postMid)
+router.post('/',autenticar, upload.single('foto'))
+router.post('/',autenticar, postMid)
+router.put('/',autenticar, postMid)
 
 router.get('/', async (req, res) => {
         const posts = await Post.findAll()

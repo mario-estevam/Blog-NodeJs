@@ -2,9 +2,9 @@ const express = require('express')
 const router = express.Router()
 const { v4: uuidv4 } = require('uuid')
 const usuarioMid = require('../middleware/validarUsuario.middleware')
-
+const bcrypt = require('bcrypt');
 const {Usuario} = require('../db/models')
-
+const jwt = require("jsonwebtoken");
 
 router.post('/', usuarioMid)
 router.put('/', usuarioMid)
@@ -18,6 +18,32 @@ router.get('/', async (req, res) => {
     }
     
 })
+
+
+router.post("/login", async (req, res) => {
+
+    const email = req.body.email;
+    const senha = req.body.senha;
+  
+    const usuario = await Usuario.findOne({
+      where: {
+        email: email,
+      },
+    });
+  
+    if (usuario && (await bcrypt.compare(senha, usuario.senha))) {
+      const payload = {
+        sub: usuario.id,
+        iss: "imd-backend",
+        aud: "imd-frontend",
+        email: usuario.email,
+      };
+      const token = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {expiresIn: '40s'})
+      res.json({ accessToken: token })
+    } else {
+      res.status(403).json({ msg: "usuário ou senha inválidos" })
+    }
+  });
 
 
 router.get('/:id', async (req, res) => {
@@ -49,10 +75,14 @@ router.delete('/', async (req, res) => {
     }
 })
 
-router.post('/', async (req, res) => {
-    const usuario = await Usuario.create(req.body)
-    res.json({msg: `Usuario ${usuario.email} criado com sucesso`})    
-})
+router.post("/", async (req, res) => {
+    const senha = req.body.senha;
+    const salt = await bcrypt.genSalt(10);
+    const senhaCriptografada = await bcrypt.hash(senha, salt);
+    const usuario = { email: req.body.email, senha: senhaCriptografada };
+    const usuarioObj = await Usuario.create(usuario);
+    res.json({ msg: "Usuário adicionado com sucesso!", userId: usuarioObj.id });
+  })
 
 
 module.exports = router

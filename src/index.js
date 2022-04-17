@@ -10,6 +10,7 @@ const logger = require('./utils/logger')
 
 const app = express()
 const logMid = require('./middleware/log.mid')
+require('dotenv').config()
 
 app.use(express.json())
 app.set('view engine', 'ejs')
