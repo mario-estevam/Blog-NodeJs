@@ -5,6 +5,8 @@ const rotaPost = require('./routes/posts.rota')
 const app = express()
 app.use(express.json())
 
+app.use('/static', express.static('public'))
+
 app.use('/usuarios', rotaUsuario)
 app.use('/posts', rotaPost)
 

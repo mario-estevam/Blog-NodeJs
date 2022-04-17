@@ -1,8 +1,31 @@
 const express = require('express')
 const router = express.Router()
-const { v4: uuidv4 } = require('uuid')
+const path = require('path')
+
 const postMid = require('../middleware/validarPost.middleware')
 const { Post, Usuario } = require('../db/models')
+var  multer   =  require ( 'multer' ) 
+
+
+var storage = multer.diskStorage({
+        destination: function (req, file, cb) {
+            cb(null, 'public/uploads')
+        },
+        filename: function (req, file, cb) {
+             cb(null, file.fieldname + "-" + Date.now() + path.extname(file.originalname)) 
+        }
+})
+
+const fileFilter = (req, file, cb) => {
+        const extensoes = /jpeg|jpg|png/i
+        if (extensoes.test(path.extname(file.originalname))){
+                cb(null, true)
+        }else{
+                return cb('Arquivo não suportado. Apenas jpg e jpeg são suportados.')
+        }
+}
+
+var upload = multer({ storage: storage, fileFilter: fileFilter })
 
 router.post('/', postMid)
 router.put('/', postMid)
@@ -24,6 +47,11 @@ router.get('/:id', async (req, res) => {
 router.post('/', async (req, res) => {
         const post = await Post.create(req.body)
         res.json({msg: "Post adicionado com sucesso!"})
+})
+
+router.post('/upload', upload . single ( 'foto' ), async (req, res) => {
+    console.log(req.file)
+    res.json({msg: 'Arquivo enviado com sucesso'})
 })
 
 router.delete('/', async (req, res) => {

@@ -3,7 +3,8 @@ module.exports = {
     properties: {
             titulo: {type: "string", maxLength: 100, minLength: 5},
             texto: {type: "string"},
-            userId: {type: "integer"}
+            userId: {type: "integer"},
+            foto: {type: "string"},
     },
     required: ["titulo", "texto", "userId"],
     additionalProperties: false
