@@ -9,15 +9,11 @@ const jwt = require("jsonwebtoken");
 router.post('/', usuarioMid)
 router.put('/', usuarioMid)
 
-router.get('/', async (req, res) => {
-    try {
-        const usuario = await Usuario.findAll()
-        res.json({usuarios: usuario})
-    } catch (error) {
-        console.log(error)
-    }
-    
-})
+router.get("/", async (req, res) => {
+  const usuarios = await Usuario.findAll();
+  const resultado = usuarios.map(user => prepararResultado(user.dataValues))
+  res.json({ usuarios: resultado });
+});
 
 
 router.post("/login", async (req, res) => {
@@ -46,10 +42,14 @@ router.post("/login", async (req, res) => {
   });
 
 
-router.get('/:id', async (req, res) => {
-    const usuario = await Usuario.findByPk(req.params.id)
-    res.json({usuarios: usuario})
-})
+  router.get("/:id", async (req, res) => {
+    const usuario = await Usuario.findByPk(req.params.id);
+    if (usuario) {
+      res.json({ usuario: prepararResultado(usuario.dataValues) });
+    } else {
+      res.status(400).json({ msg: "Usuário não encontrado!" });
+    }
+  });
 
 router.put('/', async (req, res) => {
     const id = req.query.id
@@ -83,6 +83,15 @@ router.post("/", async (req, res) => {
     const usuarioObj = await Usuario.create(usuario);
     res.json({ msg: "Usuário adicionado com sucesso!", userId: usuarioObj.id });
   })
+
+
+  function prepararResultado(usuario){
+    const result = Object.assign({}, usuario)
+    if (result.createdAt) delete result.createdAt
+    if (result.updatedAt) delete result.updatedAt
+    if (result.senha) delete result.senha
+    return result
+  }
 
 
 module.exports = router

@@ -1,28 +1,26 @@
 const express = require('express')
+const swaggerUi = require('swagger-ui-express');
+const YAML = require('yamljs');
+const swaggerDocument = YAML.load('./api.yaml');
+var expressLayouts = require('express-ejs-layouts')
+//rotas
 const rotaUsuario = require('./routes/usuario.rota')
 const rotaPost = require('./routes/posts.rota')
-
-var expressLayouts = require('express-ejs-layouts')
-
 const indexRoute = require('./routes/index.rota')
-
+//
 const logger = require('./utils/logger')
-
 const app = express()
 const logMid = require('./middleware/log.mid')
-require('dotenv').config()
 
+
+require('dotenv').config()
+app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use(express.json())
 app.set('view engine', 'ejs')
 app.use(logMid)
-
-
 app.set('layout', 'layouts/layout')
-
 app.use(expressLayouts)
-
 app.use('/static', express.static('public'))
-
 app.use('/api/usuarios', rotaUsuario)
 app.use('/api/posts', rotaPost)
 app.use('/', indexRoute)
