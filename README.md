@@ -5,6 +5,7 @@ API REST desenvolvida a partir do estudo do software NodeJs
 <p>
   A ideia da aplicação é um blog, onde apenas usuários logados conseguem fazer publicações/alterações em um post.
   Foram utilizadas tecnologias como Express, JWT (para autenticação de usuários) etc.
+	Foram criadas views para consumo e teste da api.
 </p>
 
 <figure>
